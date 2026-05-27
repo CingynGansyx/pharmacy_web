@@ -97,10 +97,7 @@ export default function MedicineList() {
   return (
     <div className="medicine-page">
       <div className="page-header">
-        <div>
-          <h1>Эмийн жагсаалт</h1>
-          <p className="page-sub">{visible.length} / {totalItems} харагдаж байна</p>
-        </div>
+        <h1>Эм <span className="muted small">({visible.length} / {totalItems})</span></h1>
         <div className="search-bar">
           <input
             type="text"

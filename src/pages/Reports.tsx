@@ -92,12 +92,9 @@ export default function Reports() {
   return (
     <div className="reports-page">
       <div className="page-header">
-        <div>
-          <h1>Гүйлгээний тайлан</h1>
-          <p className="page-sub">Шүүлтүүртэй гүйлгээний түүх — CSV экспорт</p>
-        </div>
+        <h1>Тайлан</h1>
         <button className="btn-primary" onClick={exportCsv} disabled={filtered.length === 0}>
-          ⬇ CSV татах
+          CSV татах
         </button>
       </div>
 

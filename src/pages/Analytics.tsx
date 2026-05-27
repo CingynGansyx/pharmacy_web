@@ -94,10 +94,7 @@ export default function Analytics() {
   return (
     <div className="analytics-page">
       <div className="page-header">
-        <div>
-          <h1>Аналитик</h1>
-          <p className="page-sub">Борлуулалт, нөөц, ангилалын тойм</p>
-        </div>
+        <h1>Аналитик</h1>
         <div className="window-switch">
           {([7, 14, 30, 90] as Window[]).map((w) => (
             <button
@@ -105,7 +102,7 @@ export default function Analytics() {
               className={window === w ? 'win-active' : ''}
               onClick={() => setWindow(w)}
             >
-              {w} хоног
+              {w}д
             </button>
           ))}
         </div>
@@ -207,23 +204,17 @@ function LineChart({ points }: { points: { x: string; y: number; max: number; co
 
   return (
     <svg className="line-chart" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2563eb" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#2563eb" stopOpacity="0" />
-        </linearGradient>
-      </defs>
       {[0.25, 0.5, 0.75, 1].map((r, i) => (
-        <line key={i} x1={P} x2={W - P} y1={P + innerH * r} y2={P + innerH * r} stroke="#e5e7eb" strokeDasharray="3 3" />
+        <line key={i} x1={P} x2={W - P} y1={P + innerH * r} y2={P + innerH * r} stroke="#f3f4f6" />
       ))}
-      <path d={area} fill="url(#lineGrad)" />
-      <path d={path} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" />
+      <path d={area} fill="#eff6ff" />
+      <path d={path} fill="none" stroke="#2563eb" strokeWidth="1.5" strokeLinejoin="round" />
       {coords.map((c, i) => (
         <g key={i}>
-          <circle cx={c.cx} cy={c.cy} r="4" fill="#2563eb" stroke="#fff" strokeWidth="2">
+          <circle cx={c.cx} cy={c.cy} r="2.5" fill="#2563eb">
             <title>{c.label}: {fmt(c.value)} ({c.count} гүйлгээ)</title>
           </circle>
-          <text x={c.cx} y={H - 8} textAnchor="middle" fontSize="11" fill="#6b7280">{c.label}</text>
+          <text x={c.cx} y={H - 8} textAnchor="middle" fontSize="10" fill="#9ca3af">{c.label}</text>
         </g>
       ))}
     </svg>

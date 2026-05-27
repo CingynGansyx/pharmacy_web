@@ -80,12 +80,10 @@ export default function Customers() {
   return (
     <div className="customers-page">
       <div className="page-header">
-        <div>
-          <h1>Хэрэглэгчид ({filtered.length})</h1>
-          <p className="page-sub">
-            Хэтэвчний нийт: <strong>{totalBalance.toLocaleString()}₮</strong> · Бонус: <strong>{totalBonus.toLocaleString()}</strong>
-          </p>
-        </div>
+        <h1>Хэрэглэгчид <span className="muted small">({filtered.length})</span></h1>
+        <span className="muted small">
+          Хэтэвч {totalBalance.toLocaleString()}₮ · Бонус {totalBonus.toLocaleString()}
+        </span>
       </div>
 
       <div className="filter-bar">

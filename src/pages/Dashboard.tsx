@@ -103,10 +103,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <div className="page-header">
-        <div>
-          <h1>Дашбоард</h1>
-          <p className="page-sub">Эмийн сангийн нэгдсэн тойм</p>
-        </div>
+        <h1>Дашбоард</h1>
       </div>
 
       {/* === Stat cards === */}
@@ -183,7 +180,7 @@ export default function Dashboard() {
       <div className="grid-2col">
         <Panel title="Нөөцийн анхааруулга" action={<Link to="/medicines?inStock=true" className="panel-link">Бүгд →</Link>}>
           {stockAlerts.length === 0 ? (
-            <p className="empty-text">Анхааруулга алга 🎉</p>
+            <p className="empty-text">Анхааруулга алга</p>
           ) : (
             <ul className="alert-list">
               {stockAlerts.map((m) => (

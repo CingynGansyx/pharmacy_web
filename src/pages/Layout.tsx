@@ -2,12 +2,12 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const NAV = [
-  { to: '/', label: 'Дашбоард', icon: '◐', end: true },
-  { to: '/medicines', label: 'Эмийн жагсаалт', icon: '◯' },
-  { to: '/customers', label: 'Хэрэглэгчид', icon: '◇' },
-  { to: '/reports', label: 'Тайлан', icon: '◰' },
-  { to: '/analytics', label: 'Аналитик', icon: '◑' },
-  { to: '/import', label: 'Excel импорт', icon: '↧' },
+  { to: '/', label: 'Дашбоард', end: true },
+  { to: '/medicines', label: 'Эм' },
+  { to: '/customers', label: 'Хэрэглэгчид' },
+  { to: '/reports', label: 'Тайлан' },
+  { to: '/analytics', label: 'Аналитик' },
+  { to: '/import', label: 'Импорт' },
 ];
 
 export default function Layout() {
@@ -23,24 +23,19 @@ export default function Layout() {
     <div className="app-layout">
       <nav className="sidebar">
         <div className="sidebar-header">
-          <h2>⊕ Pharmacy+</h2>
+          <h2>Pharmacy</h2>
           <span className="user-name">{user?.fullName}</span>
         </div>
 
         <ul className="nav-links">
           {NAV.map((n) => (
             <li key={n.to}>
-              <NavLink to={n.to} end={n.end}>
-                <span className="nav-icon">{n.icon}</span>
-                <span>{n.label}</span>
-              </NavLink>
+              <NavLink to={n.to} end={n.end}>{n.label}</NavLink>
             </li>
           ))}
         </ul>
 
-        <button className="logout-btn" onClick={handleLogout}>
-          ⇥ Гарах
-        </button>
+        <button className="logout-btn" onClick={handleLogout}>Гарах</button>
       </nav>
 
       <main className="main-content">
