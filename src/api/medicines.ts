@@ -11,6 +11,15 @@ export interface Medicine {
   category: string;
   expiryDate: string;
   prescriptionRequired: boolean;
+  innName?: string | null;
+  atcCode?: string | null;
+  form?: string | null;
+  insuranceDiscountPercent?: number | null;
+}
+
+export function discountedPrice(m: Pick<Medicine, 'price' | 'insuranceDiscountPercent'>): number {
+  if (m.insuranceDiscountPercent == null || m.insuranceDiscountPercent <= 0) return m.price;
+  return m.price * (100 - m.insuranceDiscountPercent) / 100;
 }
 
 export interface MedicinePage {

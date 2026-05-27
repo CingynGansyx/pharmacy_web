@@ -1,12 +1,11 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE = 'https://nemesis-tribesman-uneven.ngrok-free.dev/api';
+const API_BASE = "https://pharmacy-kr00.onrender.com/api";
 
 const client = axios.create({
   baseURL: API_BASE,
   headers: {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
+    "Content-Type": "application/json",
   },
 });
 
