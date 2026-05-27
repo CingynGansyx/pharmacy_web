@@ -2,7 +2,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Layout from './pages/Layout';
+import Dashboard from './pages/Dashboard';
 import MedicineList from './pages/MedicineList';
+import Customers from './pages/Customers';
+import Reports from './pages/Reports';
+import Analytics from './pages/Analytics';
 import ExcelImport from './pages/ExcelImport';
 import './App.css';
 
@@ -31,7 +35,11 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<MedicineList />} />
+        <Route index element={<Dashboard />} />
+        <Route path="medicines" element={<MedicineList />} />
+        <Route path="customers" element={<Customers />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="analytics" element={<Analytics />} />
         <Route path="import" element={<ExcelImport />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

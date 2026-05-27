@@ -1,6 +1,15 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const NAV = [
+  { to: '/', label: 'Дашбоард', icon: '◐', end: true },
+  { to: '/medicines', label: 'Эмийн жагсаалт', icon: '◯' },
+  { to: '/customers', label: 'Хэрэглэгчид', icon: '◇' },
+  { to: '/reports', label: 'Тайлан', icon: '◰' },
+  { to: '/analytics', label: 'Аналитик', icon: '◑' },
+  { to: '/import', label: 'Excel импорт', icon: '↧' },
+];
+
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -14,23 +23,23 @@ export default function Layout() {
     <div className="app-layout">
       <nav className="sidebar">
         <div className="sidebar-header">
-          <h2>Эмийн сан</h2>
+          <h2>⊕ Pharmacy+</h2>
           <span className="user-name">{user?.fullName}</span>
         </div>
 
         <ul className="nav-links">
-          <li>
-            <NavLink to="/" end>
-              Эм жагсаалт
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/import">Excel оруулах</NavLink>
-          </li>
+          {NAV.map((n) => (
+            <li key={n.to}>
+              <NavLink to={n.to} end={n.end}>
+                <span className="nav-icon">{n.icon}</span>
+                <span>{n.label}</span>
+              </NavLink>
+            </li>
+          ))}
         </ul>
 
         <button className="logout-btn" onClick={handleLogout}>
-          Гарах
+          ⇥ Гарах
         </button>
       </nav>
 
