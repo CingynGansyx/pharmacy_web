@@ -95,7 +95,7 @@ export default function MedicineList() {
     (insFilter !== 'ALL' ? 1 : 0);
 
   return (
-    <div className="medicine-page">
+    <div className="medicine-page page-fill">
       <div className="page-header">
         <h1>Эм <span className="muted small">({visible.length} / {totalItems})</span></h1>
         <div className="search-bar">
@@ -181,7 +181,7 @@ export default function MedicineList() {
         <p className="empty-text">Тохирох эм олдсонгүй</p>
       ) : (
         <>
-          <div className="table-wrapper">
+          <div className="table-wrapper scroll-table">
             <table className="data-table">
               <thead>
                 <tr>

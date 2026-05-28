@@ -90,7 +90,7 @@ export default function Reports() {
   };
 
   return (
-    <div className="reports-page">
+    <div className="reports-page page-fill">
       <div className="page-header">
         <h1>Тайлан</h1>
         <button className="btn-primary" onClick={exportCsv} disabled={filtered.length === 0}>
@@ -135,7 +135,7 @@ export default function Reports() {
       ) : filtered.length === 0 ? (
         <p className="empty-text">Тохирох гүйлгээ алга</p>
       ) : (
-        <div className="table-wrapper">
+        <div className="table-wrapper scroll-table">
           <table className="data-table">
             <thead>
               <tr>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getAllUsers, depositWallet, withdrawWallet } from '../api/users';
-import type { User } from '../api/auth';
+import { register, type User } from '../api/auth';
 
 type RoleFilter = 'ALL' | 'CUSTOMER' | 'STAFF';
 
@@ -14,6 +14,7 @@ export default function Customers() {
   const [selected, setSelected] = useState<User | null>(null);
   const [walletDelta, setWalletDelta] = useState('');
   const [busy, setBusy] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -33,13 +34,12 @@ export default function Customers() {
     const s = q.trim().toLowerCase();
     const list = users
       .filter((u) => role === 'ALL' || u.role === role)
-      .filter((u) =>
-        !s ||
-        u.fullName?.toLowerCase().includes(s) ||
-        u.username?.toLowerCase().includes(s) ||
-        u.phone?.includes(s) ||
-        u.email?.toLowerCase().includes(s),
-      );
+      .filter((u) => {
+        if (!s) return true;
+        return [u.fullName, u.username, u.phone, u.email, String(u.id)]
+          .filter(Boolean)
+          .some((v) => v.toLowerCase().includes(s));
+      });
     list.sort((a, b) => {
       let r = 0;
       if (sortBy === 'name') r = (a.fullName || '').localeCompare(b.fullName || '');
@@ -70,26 +70,27 @@ export default function Customers() {
       setWalletDelta('');
       setSelected(null);
       await load();
-    } catch {
-      // ignore — keep UI calm
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <div className="customers-page">
+    <div className="customers-page page-fill">
       <div className="page-header">
         <h1>Хэрэглэгчид <span className="muted small">({filtered.length})</span></h1>
-        <span className="muted small">
-          Хэтэвч {totalBalance.toLocaleString()}₮ · Бонус {totalBonus.toLocaleString()}
-        </span>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span className="muted small">
+            Хэтэвч {totalBalance.toLocaleString()}₮ · Бонус {totalBonus.toLocaleString()}
+          </span>
+          <button className="btn-primary" onClick={() => setCreating(true)}>+ Бүртгэх</button>
+        </div>
       </div>
 
       <div className="filter-bar">
         <input
           type="text"
-          placeholder="Нэр, утас, имэйл, нэвтрэх нэрээр хайх..."
+          placeholder="Нэр / утас / имэйл / нэвтрэх нэр / ID..."
           value={q}
           onChange={(e) => setQ(e.target.value)}
           className="filter-input"
@@ -101,12 +102,12 @@ export default function Customers() {
         </select>
       </div>
 
-      {loading ? (
-        <p className="loading-text">Ачааллаж байна...</p>
-      ) : filtered.length === 0 ? (
-        <p className="empty-text">Хэрэглэгч олдсонгүй</p>
-      ) : (
-        <div className="table-wrapper">
+      <div className="table-wrapper scroll-table">
+        {loading ? (
+          <p className="loading-text">Ачааллаж байна...</p>
+        ) : filtered.length === 0 ? (
+          <p className="empty-text">Хэрэглэгч олдсонгүй</p>
+        ) : (
           <table className="data-table">
             <thead>
               <tr>
@@ -117,7 +118,7 @@ export default function Customers() {
                 <th>Эрх</th>
                 <th className="sortable num" onClick={() => flipSort('balance')}>Хэтэвч{sortIcon('balance')}</th>
                 <th className="sortable num" onClick={() => flipSort('bonus')}>Бонус{sortIcon('bonus')}</th>
-                <th>Үйлдэл</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -146,53 +147,156 @@ export default function Customers() {
               ))}
             </tbody>
           </table>
-        </div>
-      )}
+        )}
+      </div>
 
       {selected && (
-        <div className="modal-backdrop" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div>
-                <h2>{selected.fullName}</h2>
-                <div className="muted">@{selected.username} · {selected.id}</div>
-              </div>
-              <button className="modal-close" onClick={() => setSelected(null)}>✕</button>
-            </div>
-            <div className="modal-stats">
-              <div className="ms">
-                <div className="ms-label">Хэтэвчний үлдэгдэл</div>
-                <div className="ms-value">{(selected.wallet?.balance ?? 0).toLocaleString()}₮</div>
-              </div>
-              <div className="ms">
-                <div className="ms-label">Бонус оноо</div>
-                <div className="ms-value">{selected.bonusPoints ?? 0}</div>
-              </div>
-            </div>
-            <div className="modal-actions">
-              <label>
-                Дүн (₮)
-                <input
-                  type="number"
-                  min="0"
-                  value={walletDelta}
-                  onChange={(e) => setWalletDelta(e.target.value)}
-                  placeholder="100000"
-                  autoFocus
-                />
-              </label>
-              <div className="modal-btns">
-                <button className="btn-primary" disabled={busy || !walletDelta} onClick={() => handleWallet('deposit')}>
-                  Цэнэглэх
-                </button>
-                <button className="btn-danger" disabled={busy || !walletDelta} onClick={() => handleWallet('withdraw')}>
-                  Гаргах
-                </button>
-              </div>
-            </div>
+        <WalletModal
+          user={selected}
+          delta={walletDelta}
+          setDelta={setWalletDelta}
+          busy={busy}
+          onClose={() => { setSelected(null); setWalletDelta(''); }}
+          onAction={handleWallet}
+        />
+      )}
+
+      {creating && (
+        <RegisterModal
+          onClose={() => setCreating(false)}
+          onCreated={async () => { setCreating(false); await load(); }}
+        />
+      )}
+    </div>
+  );
+}
+
+function WalletModal({ user, delta, setDelta, busy, onClose, onAction }: {
+  user: User;
+  delta: string;
+  setDelta: (v: string) => void;
+  busy: boolean;
+  onClose: () => void;
+  onAction: (mode: 'deposit' | 'withdraw') => void;
+}) {
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <div>
+            <h2>{user.fullName}</h2>
+            <div className="muted small">@{user.username} · {user.id}</div>
+          </div>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-stats">
+          <div className="ms">
+            <div className="ms-label">Хэтэвч</div>
+            <div className="ms-value">{(user.wallet?.balance ?? 0).toLocaleString()}₮</div>
+          </div>
+          <div className="ms">
+            <div className="ms-label">Бонус</div>
+            <div className="ms-value">{user.bonusPoints ?? 0}</div>
           </div>
         </div>
-      )}
+        <div className="modal-actions">
+          <label>
+            Дүн (₮)
+            <input
+              type="number"
+              min="0"
+              value={delta}
+              onChange={(e) => setDelta(e.target.value)}
+              placeholder="100000"
+              autoFocus
+            />
+          </label>
+          <div className="modal-btns">
+            <button className="btn-primary" disabled={busy || !delta} onClick={() => onAction('deposit')}>Цэнэглэх</button>
+            <button className="btn-danger" disabled={busy || !delta} onClick={() => onAction('withdraw')}>Гаргах</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RegisterModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [form, setForm] = useState({
+    username: '', password: '', fullName: '', phone: '', email: '',
+    role: 'STAFF' as 'STAFF' | 'CUSTOMER',
+  });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const set = (k: keyof typeof form, v: string) => setForm((s) => ({ ...s, [k]: v }));
+
+  const submit = async () => {
+    setError('');
+    if (!form.username || !form.password || !form.fullName) {
+      setError('Нэвтрэх нэр, нууц үг, бүтэн нэр заавал шаардлагатай');
+      return;
+    }
+    setBusy(true);
+    try {
+      await register(form);
+      onCreated();
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } };
+      setError(err.response?.data?.message ?? 'Бүртгэх үед алдаа гарлаа');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal modal-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Хэрэглэгч бүртгэх</h2>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-body">
+          {error && <div className="error-msg">{error}</div>}
+          <div className="form-grid">
+            <label>
+              Эрх *
+              <select value={form.role} onChange={(e) => set('role', e.target.value)}>
+                <option value="STAFF">Ажилтан</option>
+                <option value="CUSTOMER">Үйлчлүүлэгч</option>
+              </select>
+            </label>
+            <label>
+              Нэвтрэх нэр *
+              <input value={form.username} onChange={(e) => set('username', e.target.value)} placeholder="staff01" autoFocus />
+            </label>
+            <label>
+              Нууц үг *
+              <input type="password" value={form.password} onChange={(e) => set('password', e.target.value)} />
+            </label>
+            <label className="full">
+              Бүтэн нэр *
+              <input value={form.fullName} onChange={(e) => set('fullName', e.target.value)} placeholder="Б.Болд" />
+            </label>
+            <label>
+              Утас
+              <input value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="99XXXXXX" />
+            </label>
+            <label>
+              Имэйл
+              <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} />
+            </label>
+          </div>
+        </div>
+        <div className="modal-actions">
+          <div className="modal-btns">
+            <button className="btn-danger" onClick={onClose}>Цуцлах</button>
+            <button className="btn-primary" onClick={submit} disabled={busy}>
+              {busy ? 'Бүртгэж байна...' : 'Бүртгэх'}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

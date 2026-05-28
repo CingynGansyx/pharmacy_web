@@ -16,6 +16,19 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  username: string;
+  password: string;
+  fullName: string;
+  phone?: string;
+  email?: string;
+  role?: 'CUSTOMER' | 'STAFF';
+}
+
 export function login(data: LoginRequest) {
   return client.post<User>('/auth/login', data);
+}
+
+export function register(data: RegisterRequest) {
+  return client.post<User>('/auth/register', data);
 }
